@@ -12,6 +12,31 @@ function OrdersPage() {
   useEffect(() => {
     if (user) {
       fetchOrders()
+      // Set up WebSocket connection for real-time updates
+      const token = localStorage.getItem('token')
+      if (user.id && token) {
+        const ws = new WebSocket(`ws://localhost:8000/api/ws/orders/${user.id}?token=${encodeURIComponent(token)}`)
+        
+        ws.onopen = () => {
+          console.log('WebSocket connected for orders')
+        }
+        
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error)
+        }
+        
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data)
+          if (data.type === 'order_update') {
+            console.log('Order update received:', data.data)
+            fetchOrders() // Refresh orders when update received
+          }
+        }
+
+        return () => {
+          ws.close()
+        }
+      }
     }
   }, [user])
 

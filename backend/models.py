@@ -50,6 +50,18 @@ class Partner(Base):
     products = relationship("Product", back_populates="partner", cascade="all, delete-orphan")
     promotions = relationship("Promotion", back_populates="partner", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="partner", foreign_keys="Order.partner_id")
+    images = relationship("PartnerImage", back_populates="partner", cascade="all, delete-orphan")
+
+class PartnerImage(Base):
+    __tablename__ = "partner_images"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    partner_id = Column(Integer, ForeignKey("partners.id"), nullable=False)
+    image_url = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
+    partner = relationship("Partner", back_populates="images")
 
 class Product(Base):
     __tablename__ = "products"
@@ -112,4 +124,3 @@ class OrderItem(Base):
     # Relationships
     order = relationship("Order", back_populates="items")
     product = relationship("Product", back_populates="order_items")
-

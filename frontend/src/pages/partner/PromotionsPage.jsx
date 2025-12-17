@@ -77,7 +77,7 @@ function PartnerPromotionsPage() {
         ...formData,
         image_url: imageUrl,
         discount_percent: formData.discount_percent ? parseFloat(formData.discount_percent) : null,
-        expires_at: formData.expires_at || null
+        expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null
       }
       
       if (editingPromotion) {

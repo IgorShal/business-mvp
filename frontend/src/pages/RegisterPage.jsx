@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import api from '../api/api'
 import './RegisterPage.css'
 
 function RegisterPage() {
@@ -16,7 +15,7 @@ function RegisterPage() {
     phone: '',
     user_type: typeFromUrl
   })
-  const { register, login } = useAuth()
+  const { register } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -37,99 +36,126 @@ function RegisterPage() {
     e.preventDefault()
     const success = await register(formData)
     if (success) {
-      // Auto login after registration
-      const loginSuccess = await login(formData.username, formData.password)
-      if (loginSuccess) {
-        if (formData.user_type === 'partner') {
-          navigate('/partner/register')
-        } else {
-          navigate('/customer')
-        }
+      if (formData.user_type === 'partner') {
+        navigate('/partner/register')
+      } else {
+        navigate('/customer')
       }
     }
   }
 
   return (
-    <div className="register-page">
-      <div className="register-container">
-        <h1>Регистрация</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="user-type-selector">
-            <label>
+    <div className="register-page page-transition">
+      <div className="register-left">
+        <div className="register-container">
+          <h1>Регистрация</h1>
+          <form onSubmit={handleSubmit} className="register-form">
+            <div className="user-type-selector">
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="user_type"
+                  value="customer"
+                  checked={formData.user_type === 'customer'}
+                  onChange={handleChange}
+                />
+                <span>Покупатель</span>
+              </label>
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="user_type"
+                  value="partner"
+                  checked={formData.user_type === 'partner'}
+                  onChange={handleChange}
+                />
+                <span>Партнер</span>
+              </label>
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
               <input
-                type="radio"
-                name="user_type"
-                value="customer"
-                checked={formData.user_type === 'customer'}
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Введите ваш email"
+                value={formData.email}
                 onChange={handleChange}
+                required
+                className="input"
               />
-              Покупатель
-            </label>
-            <label>
+            </div>
+            <div className="form-group">
+              <label htmlFor="username">Имя пользователя</label>
               <input
-                type="radio"
-                name="user_type"
-                value="partner"
-                checked={formData.user_type === 'partner'}
+                id="username"
+                type="text"
+                name="username"
+                placeholder="Введите имя пользователя"
+                value={formData.username}
                 onChange={handleChange}
+                required
+                className="input"
               />
-              Партнер
-            </label>
-          </div>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="input"
-          />
-          <input
-            type="text"
-            name="username"
-            placeholder="Имя пользователя"
-            value={formData.username}
-            onChange={handleChange}
-            required
-            className="input"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Пароль"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="input"
-          />
-          <input
-            type="text"
-            name="full_name"
-            placeholder="Полное имя"
-            value={formData.full_name}
-            onChange={handleChange}
-            className="input"
-          />
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Телефон"
-            value={formData.phone}
-            onChange={handleChange}
-            className="input"
-          />
-          <button type="submit" className="btn btn-primary">
-            Зарегистрироваться
-          </button>
-        </form>
-        <p>
-          Уже есть аккаунт? <Link to="/login">Войти</Link>
-        </p>
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Пароль</label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Введите пароль"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="full_name">Полное имя</label>
+              <input
+                id="full_name"
+                type="text"
+                name="full_name"
+                placeholder="Введите ваше имя"
+                value={formData.full_name}
+                onChange={handleChange}
+                className="input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="phone">Телефон</label>
+              <input
+                id="phone"
+                type="tel"
+                name="phone"
+                placeholder="Введите номер телефона"
+                value={formData.phone}
+                onChange={handleChange}
+                className="input"
+              />
+            </div>
+            <button type="submit" className="btn-register">
+              Зарегистрироваться
+            </button>
+            <p className="login-link">
+              Уже есть аккаунт? <Link to="/login">Войти</Link>
+            </p>
+          </form>
+        </div>
+      </div>
+      <div className="register-right">
+        <div className="food-background">
+          <div className="food-item food-item-1">🍕</div>
+          <div className="food-item food-item-2">🍔</div>
+          <div className="food-item food-item-3">🍜</div>
+          <div className="food-item food-item-4">🥗</div>
+          <div className="food-item food-item-5">🍰</div>
+          <div className="food-item food-item-6">☕</div>
+        </div>
       </div>
     </div>
   )
 }
 
 export default RegisterPage
-

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../contexts/CartContext'
 import api from '../../api/api'
@@ -9,7 +9,25 @@ import './CartPage.css'
 function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart, getTotal } = useCart()
   const [orderPlaced, setOrderPlaced] = useState(null)
+  const [partners, setPartners] = useState({})
   const navigate = useNavigate()
+
+  useEffect(() => {
+    fetchPartners()
+  }, [])
+
+  const fetchPartners = async () => {
+    try {
+      const response = await api.get('/api/customer/partners')
+      const partnersMap = {}
+      response.data.forEach(partner => {
+        partnersMap[partner.id] = partner
+      })
+      setPartners(partnersMap)
+    } catch (error) {
+      console.error('Error fetching partners:', error)
+    }
+  }
 
   const handleCheckout = async () => {
     if (cart.length === 0) {
@@ -96,7 +114,7 @@ function CartPage() {
       <h1>Корзина</h1>
       {Object.entries(cartByPartner).map(([partnerId, items]) => (
         <div key={partnerId} className="partner-cart-section">
-          <h2>Заведение #{partnerId}</h2>
+          <h2>{partners[partnerId]?.name || `Заведение #${partnerId}`}</h2>
           {items.map(item => (
             <div key={`${item.product.id}-${item.partnerId}`} className="cart-item">
               <div className="cart-item-info">

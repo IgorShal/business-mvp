@@ -49,6 +49,19 @@ class PartnerUpdate(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
 
+# Partner Image Schemas
+class PartnerImageResponse(BaseModel):
+    id: int
+    partner_id: int
+    image_url: str
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class PartnerImageCreate(BaseModel):
+    image_url: str
+
 # Product Schemas
 class ProductBase(BaseModel):
     name: str

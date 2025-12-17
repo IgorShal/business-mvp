@@ -34,10 +34,10 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     try {
       const formData = new FormData()
-      formData.append('username', username)
+      formData.append('username', email) // OAuth2PasswordRequestForm uses 'username' field
       formData.append('password', password)
       
       const response = await axios.post(`${API_URL}/api/auth/login`, formData, {
@@ -59,9 +59,11 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      await axios.post(`${API_URL}/api/auth/register`, userData)
+      const response = await axios.post(`${API_URL}/api/auth/register`, userData)
       toast.success('Регистрация успешна')
-      return true
+      // Auto login after registration - use email, not username
+      const loginSuccess = await login(userData.email, userData.password)
+      return loginSuccess
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Ошибка регистрации')
       return false

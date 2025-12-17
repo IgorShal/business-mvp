@@ -51,7 +51,7 @@ function PromotionsPage() {
               {promotion.discount_percent && (
                 <span className="discount">Скидка: {promotion.discount_percent}%</span>
               )}
-              <Link to="/customer/map" className="btn btn-primary">
+              <Link to={`/customer/map?partner=${promotion.partner_id}`} className="btn btn-primary">
                 Посмотреть на карте
               </Link>
             </div>

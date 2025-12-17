@@ -59,17 +59,37 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
-    return db.query(User).filter(User.email == email).first()
+    import logging
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        logging.warning(f"User not found in database: {email}")
+        # Try case-insensitive search
+        all_users = db.query(User).all()
+        for u in all_users:
+            if u.email and u.email.lower() == email.lower():
+                logging.info(f"Found user with case-insensitive match: {u.email}")
+                return u
+    return user
 
 def get_user_by_username(db: Session, username: str) -> Optional[User]:
     return db.query(User).filter(User.username == username).first()
 
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
-    user = get_user_by_username(db, username)
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
+    import logging
+    logging.info(f"Attempting to authenticate user with email: {email}")
+    user = get_user_by_email(db, email)
     if not user:
+        logging.warning(f"User not found: {email}")
+        # Debug: check all users in database
+        all_users = db.query(User).all()
+        logging.info(f"Total users in database: {len(all_users)}")
+        for u in all_users:
+            logging.info(f"  - User ID: {u.id}, Email: {u.email}, Username: {u.username}")
         return None
     if not verify_password(password, user.hashed_password):
+        logging.warning(f"Password verification failed for user: {email}")
         return None
+    logging.info(f"User authenticated successfully: {email}")
     return user
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
@@ -80,12 +100,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        identifier: str = payload.get("sub")
+        if identifier is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = get_user_by_username(db, username=username)
+    # Get user by email (email is now the primary identifier in tokens)
+    # Only check username for backward compatibility with old tokens
+    user = get_user_by_email(db, email=identifier)
+    if not user:
+        # Backward compatibility: try username only for old tokens
+        user = get_user_by_username(db, username=identifier)
     if user is None:
         raise credentials_exception
     return user

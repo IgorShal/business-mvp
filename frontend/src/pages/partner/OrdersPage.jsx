@@ -11,8 +11,17 @@ function OrdersPage() {
     fetchOrders()
     // Set up WebSocket connection for real-time updates
     const user = JSON.parse(localStorage.getItem('user') || '{}')
-    if (user.id) {
-      const ws = new WebSocket(`ws://localhost:8000/api/ws/orders/${user.id}`)
+    const token = localStorage.getItem('token')
+    if (user.id && token) {
+      const ws = new WebSocket(`ws://localhost:8000/api/ws/orders/${user.id}?token=${encodeURIComponent(token)}`)
+      
+      ws.onopen = () => {
+        console.log('WebSocket connected')
+      }
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error)
+      }
       
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data)
@@ -33,7 +42,13 @@ function OrdersPage() {
       setOrders(response.data)
     } catch (error) {
       console.error('Error fetching orders:', error)
-      toast.error('Ошибка при загрузке заказов')
+      if (error.response?.status === 403) {
+        toast.error('Нет доступа. Убедитесь, что вы зарегистрированы как партнер.')
+      } else if (error.response?.status === 404) {
+        toast.error('Профиль партнера не найден. Пожалуйста, зарегистрируйте заведение.')
+      } else {
+        toast.error('Ошибка при загрузке заказов')
+      }
     } finally {
       setLoading(false)
     }

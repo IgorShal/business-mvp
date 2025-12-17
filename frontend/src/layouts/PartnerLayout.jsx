@@ -24,6 +24,7 @@ function PartnerLayout() {
           <Link to="/partner/promotions">Акции</Link>
           <Link to="/partner/statistics">Статистика</Link>
           <Link to="/partner/profile">Профиль</Link>
+          <Link to="/partner/images">Фото</Link>
           <button onClick={handleLogout} className="btn-logout">Выход</button>
         </div>
       </nav>

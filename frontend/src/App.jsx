@@ -20,6 +20,7 @@ import PartnerProductsPage from './pages/partner/ProductsPage'
 import PartnerPromotionsPage from './pages/partner/PromotionsPage'
 import PartnerStatisticsPage from './pages/partner/StatisticsPage'
 import PartnerProfilePage from './pages/partner/ProfilePage'
+import ProfileImagesPage from './pages/partner/ProfileImagesPage'
 import PartnerRegisterPage from './pages/PartnerRegisterPage'
 import { PartnerProfileCheck } from './components/PartnerProfileCheck'
 import './App.css'
@@ -77,6 +78,7 @@ function AppRoutes() {
         <Route path="promotions" element={<PartnerProfileCheck><PartnerPromotionsPage /></PartnerProfileCheck>} />
         <Route path="statistics" element={<PartnerProfileCheck><PartnerStatisticsPage /></PartnerProfileCheck>} />
         <Route path="profile" element={<PartnerProfileCheck><PartnerProfilePage /></PartnerProfileCheck>} />
+        <Route path="images" element={<PartnerProfileCheck><ProfileImagesPage /></PartnerProfileCheck>} />
       </Route>
     </Routes>
   )

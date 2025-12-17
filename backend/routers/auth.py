@@ -14,10 +14,18 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserResponse)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
+    import logging
+    logging.info(f"Registering new user with email: {user_data.email}, username: {user_data.username}")
+    
     # Check if user exists
-    if db.query(User).filter(User.email == user_data.email).first():
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    if existing_user:
+        logging.warning(f"Email already registered: {user_data.email}")
         raise HTTPException(status_code=400, detail="Email already registered")
-    if db.query(User).filter(User.username == user_data.username).first():
+    
+    existing_username = db.query(User).filter(User.username == user_data.username).first()
+    if existing_username:
+        logging.warning(f"Username already taken: {user_data.username}")
         raise HTTPException(status_code=400, detail="Username already taken")
     
     # Create user
@@ -38,6 +46,13 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    
+    # Verify user was created
+    verify_user = db.query(User).filter(User.email == user_data.email).first()
+    if verify_user:
+        logging.info(f"User successfully created: ID={verify_user.id}, Email={verify_user.email}")
+    else:
+        logging.error(f"User creation failed - user not found after commit: {user_data.email}")
     
     return db_user
 
@@ -72,22 +87,18 @@ def register_partner(
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # OAuth2PasswordRequestForm uses 'username' field, but we'll treat it as email
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        # Debug: check if user exists and what hash they have
-        user_check = db.query(User).filter(User.username == form_data.username).first()
-        if user_check:
-            import logging
-            logging.warning(f"Login failed for user {form_data.username}. Hash type: {user_check.hashed_password[:20] if user_check.hashed_password else 'None'}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -109,5 +120,23 @@ def test_password_hash(password: str, db: Session = Depends(get_db)):
         "verified": verified,
         "hash_length": len(hashed),
         "hash_prefix": hashed[:30]
+    }
+
+@router.get("/debug/users")
+def debug_users(db: Session = Depends(get_db)):
+    """Debug endpoint to list all users in database"""
+    users = db.query(User).all()
+    return {
+        "total_users": len(users),
+        "users": [
+            {
+                "id": u.id,
+                "email": u.email,
+                "username": u.username,
+                "user_type": u.user_type.value if u.user_type else None,
+                "created_at": u.created_at.isoformat() if u.created_at else None
+            }
+            for u in users
+        ]
     }
 

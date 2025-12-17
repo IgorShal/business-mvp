@@ -8,13 +8,28 @@ import './HomePage.css'
 function HomePage() {
   const [promotions, setPromotions] = useState([])
   const [products, setProducts] = useState([])
+  const [partners, setPartners] = useState({})
   const [searchQuery, setSearchQuery] = useState('')
   const { addToCart } = useCart()
 
   useEffect(() => {
     fetchPromotions()
     fetchProducts()
+    fetchPartners()
   }, [])
+
+  const fetchPartners = async () => {
+    try {
+      const response = await api.get('/api/customer/partners')
+      const partnersMap = {}
+      response.data.forEach(partner => {
+        partnersMap[partner.id] = partner
+      })
+      setPartners(partnersMap)
+    } catch (error) {
+      console.error('Error fetching partners:', error)
+    }
+  }
 
   const fetchPromotions = async () => {
     try {
@@ -112,6 +127,14 @@ function HomePage() {
               <div className="product-content">
                 <h3>{product.name}</h3>
                 <p>{product.description}</p>
+                {partners[product.partner_id] && (
+                  <Link 
+                    to={`/customer/map?partner=${product.partner_id}`}
+                    className="partner-link"
+                  >
+                    {partners[product.partner_id].name}
+                  </Link>
+                )}
                 <div className="product-footer">
                   <span className="price">{product.price} ₽</span>
                   <button 

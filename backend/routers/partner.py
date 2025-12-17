@@ -3,14 +3,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
 from database import get_db
-from models import User, Partner, Product, Promotion, Order, OrderItem, OrderStatus, UserType
+from models import User, Partner, Product, Promotion, Order, OrderItem, OrderStatus, UserType, PartnerImage
 from routers.websocket import manager
 from schemas import (
     PartnerResponse, PartnerUpdate,
     ProductCreate, ProductResponse, ProductUpdate,
     PromotionCreate, PromotionResponse, PromotionUpdate,
     OrderResponse, OrderUpdate,
-    StatisticsResponse
+    StatisticsResponse, PartnerImageResponse, PartnerImageCreate
 )
 from auth import get_current_user
 
@@ -241,4 +241,37 @@ def get_statistics(partner: Partner = Depends(get_partner_profile), db: Session 
         active_promotions=active_promotions,
         total_products=total_products
     )
+
+# Partner Images
+@router.get("/images", response_model=List[PartnerImageResponse])
+def get_partner_images(partner: Partner = Depends(get_partner_profile), db: Session = Depends(get_db)):
+    return db.query(PartnerImage).filter(PartnerImage.partner_id == partner.id).order_by(PartnerImage.created_at.desc()).all()
+
+@router.post("/images", response_model=PartnerImageResponse)
+async def upload_partner_image(
+    image_data: PartnerImageCreate,
+    partner: Partner = Depends(get_partner_profile),
+    db: Session = Depends(get_db)
+):
+    db_image = PartnerImage(
+        partner_id=partner.id,
+        image_url=image_data.image_url
+    )
+    db.add(db_image)
+    db.commit()
+    db.refresh(db_image)
+    return db_image
+
+@router.delete("/images/{image_id}")
+def delete_partner_image(
+    image_id: int,
+    partner: Partner = Depends(get_partner_profile),
+    db: Session = Depends(get_db)
+):
+    image = db.query(PartnerImage).filter(PartnerImage.id == image_id, PartnerImage.partner_id == partner.id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    db.delete(image)
+    db.commit()
+    return {"message": "Image deleted successfully"}
 

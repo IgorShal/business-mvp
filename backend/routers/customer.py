@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-from models import User, Partner, Product, Promotion, Order, OrderItem, OrderStatus, UserType
+from models import User, Partner, Product, Promotion, Order, OrderItem, OrderStatus, UserType, PartnerImage, PartnerImage
 from schemas import (
     PartnerResponse, ProductResponse, PromotionResponse,
     OrderCreate, OrderResponse, OrderUpdate

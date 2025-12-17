@@ -171,6 +171,22 @@
   border: 1px solid #45d84f;
 }
 
+.partner-link {
+  display: inline-block;
+  color: #54F094;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  transition: color 0.3s ease;
+  font-size: 14px;
+}
+
+.partner-link:hover {
+  color: #54F0C9;
+  text-decoration: underline;
+}
+
 .product-footer {
   display: flex;
   justify-content: space-between;

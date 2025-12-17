@@ -1,9 +1,10 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Order, User
-from auth import get_current_user
-from typing import Dict, List
+from auth import get_user_by_username, get_user_by_email, SECRET_KEY, ALGORITHM
+from typing import Dict, List, Optional
+from jose import JWTError, jwt
 import json
 
 router = APIRouter(prefix="/api/ws", tags=["websocket"])
@@ -47,16 +48,51 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@router.websocket("/orders/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: int):
-    await manager.connect(websocket, user_id)
+async def get_user_from_token(token: Optional[str], db: Session) -> Optional[User]:
+    if not token:
+        return None
     try:
-        while True:
-            data = await websocket.receive_text()
-            # Echo back or handle incoming messages
-            await websocket.send_json({"type": "ping", "message": "connected"})
-    except WebSocketDisconnect:
-        manager.disconnect(websocket, user_id)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        identifier: str = payload.get("sub")
+        if identifier is None:
+            return None
+        # Get user by email (email is now the primary identifier in tokens)
+        # Only check username for backward compatibility with old tokens
+        user = get_user_by_email(db, email=identifier)
+        if not user:
+            # Backward compatibility: try username only for old tokens
+            user = get_user_by_username(db, username=identifier)
+        return user
+    except JWTError:
+        return None
+
+@router.websocket("/orders/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int, token: Optional[str] = Query(None)):
+    # Get database session manually
+    db_gen = get_db()
+    db = next(db_gen)
+    try:
+        # Verify authentication
+        user = await get_user_from_token(token, db)
+        if not user:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+        
+        # Verify user_id matches authenticated user
+        if user.id != user_id:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+        
+        await manager.connect(websocket, user_id)
+        try:
+            while True:
+                data = await websocket.receive_text()
+                # Echo back or handle incoming messages
+                await websocket.send_json({"type": "ping", "message": "connected"})
+        except WebSocketDisconnect:
+            manager.disconnect(websocket, user_id)
+    finally:
+        db.close()
 
 # Helper function to notify about order updates
 async def notify_order_update(order: Order, db: Session):

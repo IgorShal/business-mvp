@@ -27,7 +27,13 @@ function ProductsPage() {
       setProducts(response.data)
     } catch (error) {
       console.error('Error fetching products:', error)
-      toast.error('Ошибка при загрузке товаров')
+      if (error.response?.status === 403) {
+        toast.error('Нет доступа. Убедитесь, что вы зарегистрированы как партнер.')
+      } else if (error.response?.status === 404) {
+        toast.error('Профиль партнера не найден. Пожалуйста, зарегистрируйте заведение.')
+      } else {
+        toast.error('Ошибка при загрузке товаров')
+      }
     }
   }
 
