@@ -1,0 +1,144 @@
+.profile-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.profile-page h1 {
+  font-size: 36px;
+  margin-bottom: 32px;
+  color: #000;
+}
+
+.profile-info {
+  margin-bottom: 40px;
+}
+
+.info-card {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.info-card h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.info-card p {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #000;
+}
+
+.orders-section h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: #000;
+}
+
+.orders-list {
+  display: grid;
+  gap: 20px;
+}
+
+.order-card {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 12px 28px rgba(84, 240, 148, 0.2);
+  transform: translateY(-4px);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.order-header h3 {
+  font-size: 22px;
+  color: #000;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-in_queue {
+  background: #54E3F0;
+  color: #000;
+}
+
+.status-in_process {
+  background: #54B2F0;
+  color: #000;
+}
+
+.status-ready {
+  background: #54F05F;
+  color: #000;
+}
+
+.status-completed {
+  background: #54F094;
+  color: #000;
+}
+
+.status-cancelled {
+  background: #ff4444;
+  color: white;
+}
+
+.order-card p {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.order-items {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.order-items h4 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.order-items ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.order-items li {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.qr-code {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.qr-code p {
+  font-size: 14px;
+  color: #000;
+  font-family: monospace;
+}
+

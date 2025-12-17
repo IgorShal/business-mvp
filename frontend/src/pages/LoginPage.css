@@ -1,0 +1,40 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #54F094 0%, #54E3F0 100%);
+}
+
+.login-container {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-container h1 {
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 32px;
+  color: #000;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container p {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.login-container a {
+  color: #54F094;
+  font-weight: 600;
+}
+

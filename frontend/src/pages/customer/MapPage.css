@@ -1,0 +1,87 @@
+.map-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.map-page h1 {
+  font-size: 36px;
+  margin-bottom: 32px;
+  color: #000;
+}
+
+.map-container {
+  margin-bottom: 32px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.marker-popup {
+  min-width: 200px;
+}
+
+.marker-popup h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.marker-popup p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.partner-details {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.partner-details h2 {
+  font-size: 28px;
+  margin-bottom: 12px;
+  color: #000;
+}
+
+.partner-details p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.partner-promotions {
+  margin-top: 24px;
+}
+
+.partner-promotions h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #000;
+}
+
+.promo-card {
+  background: linear-gradient(135deg, rgba(84, 240, 201, 0.1) 0%, rgba(84, 240, 148, 0.1) 100%);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.promo-card:hover {
+  box-shadow: 0 4px 12px rgba(84, 240, 201, 0.2);
+  transform: translateY(-2px);
+}
+
+.promo-card h4 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.promo-card p {
+  color: #000;
+  margin-bottom: 0;
+}
+

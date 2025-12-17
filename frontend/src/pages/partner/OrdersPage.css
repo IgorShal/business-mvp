@@ -1,0 +1,105 @@
+.orders-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.orders-page h1 {
+  font-size: 36px;
+  margin-bottom: 32px;
+  color: #000;
+}
+
+.orders-list {
+  display: grid;
+  gap: 24px;
+}
+
+.order-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.order-header h2 {
+  font-size: 24px;
+  color: #000;
+}
+
+.status {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.status-in_queue {
+  background: #54E3F0;
+  color: #000;
+}
+
+.status-in_process {
+  background: #54B2F0;
+  color: #000;
+}
+
+.status-ready {
+  background: #54F05F;
+  color: #000;
+}
+
+.status-completed {
+  background: #54F094;
+  color: #000;
+}
+
+.order-info {
+  margin-bottom: 20px;
+}
+
+.order-info p {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.order-items {
+  margin-bottom: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.order-items h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #000;
+}
+
+.order-items ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.order-items li {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.order-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-danger {
+  background: #ff4444;
+  color: white;
+}
+
