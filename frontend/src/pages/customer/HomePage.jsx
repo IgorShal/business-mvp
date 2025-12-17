@@ -34,7 +34,8 @@ function HomePage() {
   const fetchPromotions = async () => {
     try {
       const response = await api.get('/api/customer/promotions')
-      setPromotions(response.data)
+      console.log('Fetched promotions:', response.data)
+      setPromotions(response.data || [])
     } catch (error) {
       console.error('Error fetching promotions:', error)
     }
@@ -49,9 +50,10 @@ function HomePage() {
     }
   }
 
-  const filteredPromotions = promotions.filter(p => 
-    p.title.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredPromotions = promotions.filter(p => {
+    if (!p) return false
+    return p.title && p.title.toLowerCase().includes(searchQuery.toLowerCase())
+  })
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -99,7 +101,7 @@ function HomePage() {
       <section className="promotions-section">
         <h2>Акции</h2>
         <div className="promotions-grid">
-          {filteredPromotions.map(promotion => (
+          {filteredPromotions.length > 0 ? filteredPromotions.map(promotion => (
             <Link key={promotion.id} to={`/customer/promotions`} className="promotion-card">
               {promotion.image_url && (
                 <img src={getImageUrl(promotion.image_url)} alt={promotion.title} />
@@ -112,7 +114,9 @@ function HomePage() {
                 )}
               </div>
             </Link>
-          ))}
+          )) : (
+            <p>Акций пока нет</p>
+          )}
         </div>
       </section>
 
@@ -136,7 +140,19 @@ function HomePage() {
                   </Link>
                 )}
                 <div className="product-footer">
-                  <span className="price">{product.price} ₽</span>
+                  <div className="price-section">
+                    {product.original_price && product.discount_percent ? (
+                      <>
+                        <div className="price-with-discount">
+                          <span className="old-price">{product.original_price} ₽</span>
+                          <span className="new-price">{product.price ? product.price.toFixed(2) : (product.original_price * (1 - product.discount_percent / 100)).toFixed(2)} ₽</span>
+                        </div>
+                        <span className="discount-badge">-{product.discount_percent}%</span>
+                      </>
+                    ) : (
+                      <span className="price">{product.price || 0} ₽</span>
+                    )}
+                  </div>
                   <button 
                     onClick={() => handleAddToCart(product, product.partner_id)} 
                     className="btn btn-primary"

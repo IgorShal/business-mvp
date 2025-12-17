@@ -66,7 +66,9 @@ class PartnerImageCreate(BaseModel):
 class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
-    price: float
+    price: Optional[float] = None  # Final price (can be calculated from original_price and discount)
+    original_price: Optional[float] = None  # Original price before discount
+    discount_percent: Optional[float] = None  # Discount percentage
     image_url: Optional[str] = None
     is_available: bool = True
 
@@ -85,6 +87,8 @@ class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = None
+    original_price: Optional[float] = None
+    discount_percent: Optional[float] = None
     image_url: Optional[str] = None
     is_available: Optional[bool] = None
 

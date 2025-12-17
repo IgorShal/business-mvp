@@ -11,6 +11,8 @@ function ProductsPage() {
     name: '',
     description: '',
     price: '',
+    original_price: '',
+    discount_percent: '',
     image_url: '',
     is_available: true
   })
@@ -78,9 +80,34 @@ function ProductsPage() {
         imageUrl = uploadedUrl
       }
       
+      // Calculate price if discount is provided
+      let finalPrice = formData.price ? parseFloat(formData.price) : null
+      let originalPrice = formData.original_price ? parseFloat(formData.original_price) : null
+      let discountPercent = formData.discount_percent ? parseFloat(formData.discount_percent) : null
+      
+      // Validate: must have either price or (original_price and discount_percent)
+      if (!finalPrice && (!originalPrice || !discountPercent)) {
+        toast.error('Укажите либо итоговую цену, либо оригинальную цену и скидку')
+        return
+      }
+      
+      // If original_price and discount_percent are provided, calculate final price
+      if (originalPrice && discountPercent) {
+        finalPrice = originalPrice * (1 - discountPercent / 100)
+      } else if (originalPrice && !discountPercent) {
+        // If only original_price is provided, use it as final price
+        finalPrice = originalPrice
+        discountPercent = null
+      }
+      
       const submitData = {
-        ...formData,
-        image_url: imageUrl
+        name: formData.name,
+        description: formData.description || null,
+        price: finalPrice,
+        original_price: originalPrice || null,
+        discount_percent: discountPercent || null,
+        image_url: imageUrl || null,
+        is_available: formData.is_available
       }
       
       if (editingProduct) {
@@ -98,6 +125,8 @@ function ProductsPage() {
         name: '',
         description: '',
         price: '',
+        original_price: '',
+        discount_percent: '',
         image_url: '',
         is_available: true
       })
@@ -113,11 +142,13 @@ function ProductsPage() {
       name: product.name,
       description: product.description || '',
       price: product.price.toString(),
+      original_price: product.original_price ? product.original_price.toString() : '',
+      discount_percent: product.discount_percent ? product.discount_percent.toString() : '',
       image_url: product.image_url || '',
       is_available: product.is_available
     })
     setImageFile(null)
-    setImagePreview(product.image_url || null)
+    setImagePreview(product.image_url ? getImageUrl(product.image_url) : null)
     setShowForm(true)
   }
 
@@ -139,7 +170,7 @@ function ProductsPage() {
     <div className="products-page">
       <div className="page-header">
         <h1>Управление товарами</h1>
-        <button onClick={() => { setShowForm(!showForm); setEditingProduct(null); setImageFile(null); setImagePreview(null); setFormData({ name: '', description: '', price: '', image_url: '', is_available: true }) }} className="btn btn-primary">
+        <button onClick={() => { setShowForm(!showForm); setEditingProduct(null); setImageFile(null); setImagePreview(null); setFormData({ name: '', description: '', price: '', original_price: '', discount_percent: '', image_url: '', is_available: true }) }} className="btn btn-primary">
           {showForm ? 'Отмена' : 'Добавить товар'}
         </button>
       </div>
@@ -164,17 +195,48 @@ function ProductsPage() {
             className="input"
             rows="4"
           />
-          <input
-            type="number"
-            name="price"
-            placeholder="Цена *"
-            value={formData.price}
-            onChange={handleChange}
-            required
-            step="0.01"
-            min="0"
-            className="input"
-          />
+          <div className="price-section">
+            <label>Вариант 1: Укажите итоговую цену (если без скидки):</label>
+            <input
+              type="number"
+              name="price"
+              placeholder="Итоговая цена"
+              value={formData.price}
+              onChange={handleChange}
+              step="0.01"
+              min="0"
+              className="input"
+            />
+            <label>Вариант 2: Или укажите оригинальную цену и скидку:</label>
+            <input
+              type="number"
+              name="original_price"
+              placeholder="Оригинальная цена"
+              value={formData.original_price}
+              onChange={handleChange}
+              step="0.01"
+              min="0"
+              className="input"
+            />
+            <input
+              type="number"
+              name="discount_percent"
+              placeholder="Скидка в %"
+              value={formData.discount_percent}
+              onChange={handleChange}
+              step="0.01"
+              min="0"
+              max="100"
+              className="input"
+            />
+            {formData.original_price && formData.discount_percent && (
+              <p className="calculated-price">
+                Итоговая цена будет рассчитана автоматически: {(
+                  parseFloat(formData.original_price) * (1 - parseFloat(formData.discount_percent) / 100)
+                ).toFixed(2)} ₽
+              </p>
+            )}
+          </div>
           <div className="image-upload-section">
             <label className="file-upload-label">
               <input

@@ -55,7 +55,7 @@ function MapPage() {
       setPartners(response.data)
       
       // Fetch promotions and images for each partner
-      for (const partner of response.data) {
+      const imagePromises = response.data.map(async (partner) => {
         try {
           const promoResponse = await api.get(`/api/customer/promotions?partner_id=${partner.id}`)
           setPromotions(prev => ({ ...prev, [partner.id]: promoResponse.data }))
@@ -65,11 +65,16 @@ function MapPage() {
         
         try {
           const imagesResponse = await api.get(`/api/customer/partners/${partner.id}/images`)
-          setPartnerImages(prev => ({ ...prev, [partner.id]: imagesResponse.data }))
+          console.log(`Fetched ${imagesResponse.data.length} images for partner ${partner.id}:`, imagesResponse.data)
+          if (imagesResponse.data && imagesResponse.data.length > 0) {
+            setPartnerImages(prev => ({ ...prev, [partner.id]: imagesResponse.data }))
+          }
         } catch (error) {
           console.error(`Error fetching images for partner ${partner.id}:`, error)
         }
-      }
+      })
+      
+      await Promise.all(imagePromises)
     } catch (error) {
       console.error('Error fetching partners:', error)
     }
@@ -109,7 +114,7 @@ function MapPage() {
                   <h3>{partner.name}</h3>
                   {partner.address && <p className="address"><strong>Адрес:</strong> {partner.address}</p>}
                   {partner.description && <p>{partner.description}</p>}
-                  {partnerImages[partner.id] && partnerImages[partner.id].length > 0 && (
+                  {partnerImages[partner.id] && partnerImages[partner.id].length > 0 ? (
                     <div className="popup-images">
                       {partnerImages[partner.id].slice(0, 2).map(image => (
                         <img 
@@ -117,10 +122,14 @@ function MapPage() {
                           src={getImageUrl(image.image_url)} 
                           alt={`${partner.name} фото`}
                           className="popup-image"
+                          onError={(e) => {
+                            console.error('Error loading popup image:', image.image_url)
+                            e.target.style.display = 'none'
+                          }}
                         />
                       ))}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </Popup>
             </Marker>

@@ -116,11 +116,22 @@ def create_product(
     partner: Partner = Depends(get_partner_profile),
     db: Session = Depends(get_db)
 ):
+    # Calculate final price if original_price and discount_percent are provided
+    final_price = product_data.price
+    if product_data.original_price and product_data.discount_percent:
+        final_price = product_data.original_price * (1 - product_data.discount_percent / 100)
+    elif product_data.original_price:
+        final_price = product_data.original_price
+    elif not final_price:
+        raise HTTPException(status_code=400, detail="Either price or original_price must be provided")
+    
     db_product = Product(
         partner_id=partner.id,
         name=product_data.name,
         description=product_data.description,
-        price=product_data.price,
+        price=final_price,
+        original_price=product_data.original_price,
+        discount_percent=product_data.discount_percent,
         image_url=product_data.image_url,
         is_available=product_data.is_available
     )
@@ -140,7 +151,16 @@ def update_product(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    for key, value in product_data.dict(exclude_unset=True).items():
+    # Calculate final price if original_price and discount_percent are provided
+    update_data = product_data.dict(exclude_unset=True)
+    if 'original_price' in update_data and 'discount_percent' in update_data:
+        if update_data['original_price'] is not None and update_data['discount_percent'] is not None:
+            update_data['price'] = update_data['original_price'] * (1 - update_data['discount_percent'] / 100)
+    elif 'original_price' in update_data and update_data['original_price'] is not None:
+        if 'discount_percent' not in update_data or update_data.get('discount_percent') is None:
+            update_data['price'] = update_data['original_price']
+    
+    for key, value in update_data.items():
         setattr(product, key, value)
     db.commit()
     db.refresh(product)

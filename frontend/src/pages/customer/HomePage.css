@@ -192,6 +192,40 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 16px;
+  gap: 12px;
+}
+
+.price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.price-with-discount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 14px;
+}
+
+.new-price {
+  color: #54F094;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.discount-badge {
+  background: linear-gradient(135deg, #54F094 0%, #54F0C9 100%);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .price {
