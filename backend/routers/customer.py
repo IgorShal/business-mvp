@@ -31,6 +31,13 @@ def get_products(partner_id: int = None, db: Session = Depends(get_db)):
         query = query.filter(Product.partner_id == partner_id)
     return query.all()
 
+@router.get("/products/{product_id}", response_model=ProductResponse)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
 @router.get("/promotions", response_model=List[PromotionResponse])
 def get_promotions(partner_id: int = None, db: Session = Depends(get_db)):
     from datetime import datetime

@@ -166,6 +166,28 @@ function ProductsPage() {
     }
   }
 
+  const handleToggleAvailability = async (product) => {
+    try {
+      const updatedProduct = {
+        ...product,
+        is_available: !product.is_available
+      }
+      await api.put(`/api/partner/products/${product.id}`, {
+        name: updatedProduct.name,
+        description: updatedProduct.description,
+        price: updatedProduct.price,
+        original_price: updatedProduct.original_price,
+        discount_percent: updatedProduct.discount_percent,
+        image_url: updatedProduct.image_url,
+        is_available: updatedProduct.is_available
+      })
+      toast.success(`Товар ${updatedProduct.is_available ? 'доступен' : 'недоступен'} для заказа`)
+      fetchProducts()
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Ошибка при обновлении товара')
+    }
+  }
+
   return (
     <div className="products-page">
       <div className="page-header">
@@ -288,10 +310,14 @@ function ProductsPage() {
               <h3>{product.name}</h3>
               <p>{product.description}</p>
               <div className="product-footer">
-                <span className="price">{product.price} ₽</span>
-                <span className={`availability ${product.is_available ? 'available' : 'unavailable'}`}>
-                  {product.is_available ? 'Доступен' : 'Недоступен'}
-                </span>
+                <span className="price">{product.price ? product.price.toFixed(2) : 0} ₽</span>
+                <button
+                  onClick={() => handleToggleAvailability(product)}
+                  className={`btn-toggle-availability ${product.is_available ? 'available' : 'unavailable'}`}
+                  title={product.is_available ? 'Снять с продажи' : 'Вернуть в продажу'}
+                >
+                  {product.is_available ? '✓ В наличии' : '✗ Нет в наличии'}
+                </button>
               </div>
               <div className="product-actions">
                 <button onClick={() => handleEdit(product)} className="btn btn-secondary">

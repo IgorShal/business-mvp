@@ -6,12 +6,12 @@ from routers import auth, customer, partner, websocket, uploads
 # Create tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Business MVP API", version="1.0.0")
+app = FastAPI(title="GoiEat API", version="1.0.0")
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,7 +26,7 @@ app.include_router(uploads.router)
 
 @app.get("/")
 def root():
-    return {"message": "Business MVP API"}
+    return {"message": "GoiEat API"}
 
 @app.get("/api/health")
 def health_check():

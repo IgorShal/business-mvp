@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: goieat-backend
+    volumes:
+      - ./backend:/app
+      - ./backend/uploads:/app/uploads
+      - goieat_db:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///./data/goieat.db
+      - SECRET_KEY=your-secret-key-change-in-production
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: goieat-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  goieat_db:
+

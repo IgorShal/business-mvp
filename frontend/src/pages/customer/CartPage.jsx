@@ -123,9 +123,23 @@ function CartPage() {
                 <span className="price">{item.product.price} ₽</span>
               </div>
               <div className="cart-item-controls">
-                <button onClick={() => updateQuantity(item.product.id, item.partnerId, item.quantity - 1)}>-</button>
+                <button onClick={async () => {
+                  const result = await updateQuantity(item.product.id, item.partnerId, item.quantity - 1)
+                  if (!result.success && result.error) {
+                    toast.error(result.error)
+                  }
+                }}>-</button>
                 <span>{item.quantity}</span>
-                <button onClick={() => updateQuantity(item.product.id, item.partnerId, item.quantity + 1)}>+</button>
+                <button onClick={async () => {
+                  const result = await updateQuantity(item.product.id, item.partnerId, item.quantity + 1)
+                  if (!result.success) {
+                    toast.error(result.error || 'Не удалось обновить количество')
+                    if (result.error && result.error.includes('удален')) {
+                      // Товар был удален из корзины, обновляем страницу
+                      window.location.reload()
+                    }
+                  }
+                }}>+</button>
                 <button onClick={() => removeFromCart(item.product.id, item.partnerId)} className="btn-remove">
                   Удалить
                 </button>

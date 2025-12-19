@@ -8,7 +8,7 @@ function LandingPage() {
   return (
     <div className="landing-page">
       <div className="landing-hero">
-        <h1>Business MVP</h1>
+        <h1>GoiEat</h1>
         <p className="hero-subtitle">Лучший сервис для заказа еды и товаров</p>
       </div>
 

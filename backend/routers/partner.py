@@ -10,7 +10,8 @@ from schemas import (
     ProductCreate, ProductResponse, ProductUpdate,
     PromotionCreate, PromotionResponse, PromotionUpdate,
     OrderResponse, OrderUpdate,
-    StatisticsResponse, PartnerImageResponse, PartnerImageCreate
+    StatisticsResponse, PartnerImageResponse, PartnerImageCreate,
+    DailySalesData, PopularProduct
 )
 from auth import get_current_user
 
@@ -239,6 +240,9 @@ def delete_promotion(
 # Statistics
 @router.get("/statistics", response_model=StatisticsResponse)
 def get_statistics(partner: Partner = Depends(get_partner_profile), db: Session = Depends(get_db)):
+    from datetime import datetime, timedelta
+    from collections import defaultdict
+    
     total_orders = db.query(Order).filter(Order.partner_id == partner.id).count()
     completed_orders = db.query(Order).filter(
         Order.partner_id == partner.id,
@@ -254,12 +258,73 @@ def get_statistics(partner: Partner = Depends(get_partner_profile), db: Session 
     ).count()
     total_products = db.query(Product).filter(Product.partner_id == partner.id).count()
     
+    # Получаем заказы за последние 30 дней
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    recent_orders = db.query(Order).filter(
+        Order.partner_id == partner.id,
+        Order.created_at >= thirty_days_ago
+    ).all()
+    
+    # Группируем по дням
+    daily_data = defaultdict(lambda: {'orders': 0, 'revenue': 0.0, 'customers': set()})
+    for order in recent_orders:
+        date_str = order.created_at.date().isoformat()
+        daily_data[date_str]['orders'] += 1
+        if order.status == OrderStatus.COMPLETED:
+            daily_data[date_str]['revenue'] += order.total_amount
+        daily_data[date_str]['customers'].add(order.customer_id)
+    
+    # Формируем список за последние 30 дней
+    daily_sales = []
+    for i in range(30):
+        date = (datetime.utcnow() - timedelta(days=i)).date()
+        date_str = date.isoformat()
+        data = daily_data.get(date_str, {'orders': 0, 'revenue': 0.0, 'customers': set()})
+        daily_sales.append({
+            'date': date_str,
+            'orders': data['orders'],
+            'revenue': data['revenue'],
+            'customers': len(data['customers'])
+        })
+    daily_sales.reverse()  # От старых к новым
+    
+    # Популярные товары (топ 10)
+    popular_items = db.query(
+        OrderItem.product_id,
+        Product.name,
+        func.sum(OrderItem.quantity).label('total_quantity'),
+        func.sum(OrderItem.price * OrderItem.quantity).label('total_revenue')
+    ).join(
+        Product, OrderItem.product_id == Product.id
+    ).join(
+        Order, OrderItem.order_id == Order.id
+    ).filter(
+        Order.partner_id == partner.id,
+        Order.status == OrderStatus.COMPLETED
+    ).group_by(
+        OrderItem.product_id, Product.name
+    ).order_by(
+        func.sum(OrderItem.quantity).desc()
+    ).limit(10).all()
+    
+    popular_products = [
+        {
+            'product_id': item.product_id,
+            'product_name': item.name,
+            'total_quantity': int(item.total_quantity),
+            'total_revenue': float(item.total_revenue or 0.0)
+        }
+        for item in popular_items
+    ]
+    
     return StatisticsResponse(
         total_orders=total_orders,
         completed_orders=completed_orders,
         total_revenue=total_revenue,
         active_promotions=active_promotions,
-        total_products=total_products
+        total_products=total_products,
+        daily_sales=[DailySalesData(**d) for d in daily_sales],
+        popular_products=[PopularProduct(**p) for p in popular_products]
     )
 
 # Partner Images

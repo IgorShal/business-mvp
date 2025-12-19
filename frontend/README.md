@@ -1,6 +1,6 @@
-# Frontend - Business MVP
+# Frontend - GoiEat
 
-React приложение для Business MVP.
+React приложение для GoiEat.
 
 ## Установка
 

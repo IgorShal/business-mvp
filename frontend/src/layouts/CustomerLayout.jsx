@@ -16,7 +16,7 @@ function CustomerLayout() {
     <div className="customer-layout">
       <nav className="customer-nav">
         <div className="nav-brand">
-          <Link to="/customer">Business MVP</Link>
+          <Link to="/customer">GoiEat</Link>
         </div>
         <div className="nav-links">
           <Link to="/customer">Главная</Link>

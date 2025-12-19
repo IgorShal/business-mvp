@@ -16,7 +16,7 @@ function PartnerLayout() {
     <div className="partner-layout">
       <nav className="partner-nav">
         <div className="nav-brand">
-          <Link to="/partner">Business MVP - Партнер</Link>
+          <Link to="/partner">GoiEat - Партнер</Link>
         </div>
         <div className="nav-links">
           <Link to="/partner/orders">Заказы</Link>

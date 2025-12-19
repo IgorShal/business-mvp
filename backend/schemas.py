@@ -167,10 +167,24 @@ class TokenData(BaseModel):
     username: Optional[str] = None
 
 # Statistics Schema
+class DailySalesData(BaseModel):
+    date: str
+    orders: int
+    revenue: float
+    customers: int
+
+class PopularProduct(BaseModel):
+    product_id: int
+    product_name: str
+    total_quantity: int
+    total_revenue: float
+
 class StatisticsResponse(BaseModel):
     total_orders: int
     completed_orders: int
     total_revenue: float
     active_promotions: int
     total_products: int
+    daily_sales: List[DailySalesData]
+    popular_products: List[PopularProduct]
 

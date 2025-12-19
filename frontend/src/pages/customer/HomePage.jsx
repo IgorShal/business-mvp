@@ -56,18 +56,22 @@ function HomePage() {
   })
 
   const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    p.is_available && p.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleAddToCart = (product, partnerId) => {
-    addToCart(product, partnerId)
-    toast.success('Товар добавлен в корзину')
+  const handleAddToCart = async (product, partnerId) => {
+    const result = await addToCart(product, partnerId)
+    if (result.success) {
+      toast.success('Товар добавлен в корзину')
+    } else {
+      toast.error(result.error || 'Не удалось добавить товар в корзину')
+    }
   }
 
   return (
     <div className="home-page">
       <section className="hero-section">
-        <h1>Добро пожаловать в Business MVP</h1>
+        <h1>Добро пожаловать в GoiEat</h1>
         <p className="hero-description">
           Лучший сервис для заказа еды и товаров из ваших любимых заведений.
           Получайте акции, делайте заказы онлайн и наслаждайтесь быстрой доставкой!

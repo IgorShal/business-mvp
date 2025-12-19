@@ -107,6 +107,39 @@
   color: white;
 }
 
+.btn-toggle-availability {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.btn-toggle-availability.available {
+  background: #54F05F;
+  color: #000;
+}
+
+.btn-toggle-availability.available:hover {
+  background: #45D04F;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(84, 240, 95, 0.3);
+}
+
+.btn-toggle-availability.unavailable {
+  background: #ff4444;
+  color: white;
+}
+
+.btn-toggle-availability.unavailable:hover {
+  background: #e03333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+}
+
 .product-actions {
   display: flex;
   gap: 12px;

@@ -1,6 +1,6 @@
-# Backend - Business MVP
+# Backend - GoiEat
 
-FastAPI backend для Business MVP.
+FastAPI backend для GoiEat.
 
 ## Установка
 

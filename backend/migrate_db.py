@@ -8,7 +8,7 @@ import sqlite3
 
 def migrate_database():
     """Add new columns to existing products table"""
-    conn = sqlite3.connect('business_mvp.db')
+    conn = sqlite3.connect('goieat.db')
     cursor = conn.cursor()
     
     try:
